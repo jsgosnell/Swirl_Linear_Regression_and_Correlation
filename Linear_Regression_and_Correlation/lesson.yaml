@@ -1,0 +1,114 @@
+- Class: meta
+  Course: Swirl_Linear_Regression_and_Correlation
+  Lesson: Linear Regression and Correlation
+  Author: J. Stephen Gosnell
+  Type: Standard
+  Organization: Baruch College, City University of New York
+  Version: 2.4.3
+
+- Class: text
+  Output: Welcome to Swirl! This interface will help review some of the code we've used in class.
+
+- Class: text
+  Output: Today we'll review how to conduct regression and correlation.  There are many ways to do this in R, but we'll focus on using the lm command.
+
+- Class: cmd_question
+  Output: So far in class we've covered ANOVA's and t-tests.  These are both examples of linear models where we investigate how a continuous response variable differs among groups. Regression and correlation instead focus on the linear relationship between two continuous variables.  For example, is there a relationship between traffic intensity and CO2 emissions near a highway?. If we use randomly collected data to assess this question we are looking at the correlation between two variables. We can analyze this question using a dataset from the OZdasl site (http://www.statsci.org/data/general/cofreewy.html for more info) in R. Load the the data using using traffic <- read.table("http://www.statsci.org/data/general/cofreewy.txt", header = T).
+  CorrectAnswer: traffic <- read.table("http://www.statsci.org/data/general/cofreewy.txt", header = T)
+  AnswerTests: omnitest(correctExpr='traffic <- read.table("http://www.statsci.org/data/general/cofreewy.txt", header = T)')
+  Hint: Try traffic <- read.table("http://www.statsci.org/data/general/cofreewy.txt", header = T)
+  
+- Class: cmd_question
+  Output: Use head to examine the dataset. 
+  CorrectAnswer: head(traffic)
+  AnswerTests: omnitest(correctExpr='head(traffic)')
+  Hint: Try head(traffic)
+
+- Class: mult_question
+  Output: What is our null hypothesis (Ho) for regression?
+  AnswerChoices: there is no linear relationship between traffic intensity and carbon emissions; there is a linear relationship between traffic intensity and carbon emissions; not sure
+  CorrectAnswer: there is no linear relationship between traffic intensity and carbon emissions
+  AnswerTests: omnitest(correctVal='there is no linear relationship between traffic intensity and carbon emissions')
+  Hint: Remember, a null hypothesis is a hypothesis of no difference!
+
+- Class: cmd_question
+  Output: To test this hypothesis, we still use the lm function just like we did for ANOVAs. Try co_traffic_relationship <- lm(CO ~ Traffic, traffic.
+  AnswerTests: omnitest(correctExpr='co_traffic_relationship <- lm(CO ~ Traffic, traffic)')
+  Hint: Try co_traffic_relationship <- lm(CO ~ Traffic, traffic).
+
+- Class: cmd_question
+  Output: Before we analyze results of any test, we need to make sure the data are appropriate for the test (our assumptions are met). For any linear model, the assumptions are that the error terms (the noise around the model fit for each point) are independent, identically distributed, and follow a normal distribution.  You can visually check this by plotting your lm object. Try plot(co_traffic_relationship).  This will return four plot that you'll need to press enter to see. 
+  CorrectAnswer: plot(co_traffic_relationship)
+  AnswerTests: omnitest(correctExpr='plot(co_traffic_relationship)')
+  Hint: Try plot(co_traffic_relationship).
+
+- Class: text
+  Output: The four plots help us make sure our data fits our assumptions.  The first (residuals vs fitted) should show no pattern. Stacks of data are ok/expected, since the ANOVA is estimating one average width for each species, but you shouldn't see one stack that is much more/less spread out.  The red line should be fairly straight!  The second graph is a normal qq plot of the residuals - they should fall along the line!  R automatically marks the three points with the largest standardized residuals. Not usually important, but if these points are way off the line you may want to check for typos in the data.  The third plot is another type of residual (studentized by default) vs fit; just check for any structure and red line being flat.  The 4th plot considers leverage (is a data point really impacting the model fit). Look for points that occur outside the dashed red Cook Distance lines (this may not exist if no high leverage points are present).
+
+- Class: cmd_question
+  Output: It looks like all our assumption were met. To get our results, we can use the summary function on the lm object you created.
+  CorrectAnswer: summary(co_traffic_relationship)
+  AnswerTests: omnitest(correctExpr='summary(co_traffic_relationship)')
+  Hint: Try summary(co_traffic_relationship).
+  
+- Class: mult_question
+  Output: First, note the p-value in the traffic row.  What is the p-value? 
+  AnswerChoices: <.001; 16.680; 0.02
+  CorrectAnswer: <.001
+  AnswerTests: omnitest(correctVal='<.001')
+  Hint: Look under the Pr(>|t|) column!
+  
+- Class: mult_question
+  Output: How do you interpret it?
+  AnswerChoices: reject H0; fail to reject H0; I'm not sure
+  CorrectAnswer: reject H0
+  AnswerTests: omnitest(correctVal='reject H0')
+  Hint: Remember, if our p-value is below .05 we typically reject the null hypothesis.
+  
+- Class: cmd_question
+  Output: So we now believe there is  a linear relationship between emissions and traffic. You could also use the Anova command (from the car package) to get a summary table. Try it now.  
+  CorrectAnswer: Anova(co_traffic_relationship, type = "III")
+  AnswerTests: omnitest(correctExpr='Anova(co_traffic_relationship, type = "III")')
+  Hint: Try Anova(co_traffic_relationship, type = "III").
+  
+- Class: mult_question
+  Output: The p-values should be the same.  So we now believe there is  a linear relationship between emissions and traffic. Looking back at the summary output, note the full model p-value is also displayed in the bottom right of the summary output and matches the traffic value (since its our only explanatory variable in the model).  We can ask how much of the variance in emissions is explained by traffic intensity by looking at the multiple r2 value in the object summary.  What is it?  
+  AnswerChoices: .93; . 07; .587
+  CorrectAnswer: .93
+  AnswerTests: omnitest(correctVal='.93')
+  
+- Class: text
+  Output: This means that 93% of the variance in emissions is explained by traffic intensity.  This is a strong relationship; if 100% of the variance was explained (the max), the statistical model would fit the data the perfectly.  Note in these statements we are assuming traffic is driving emissions. In correlation analysis, especially when we are using random data sets, we are actually only looking at relationships, but sometimes we make assumptions about drivers (it doesn't really make sense for emissions to drive traffice).   
+ 
+- Class: cmd_question
+  Output: We just analyzed the multiple r2 value, but we can also ask about r (correlation).  This is useful as it tells us the direction of the relationship. r varies from - 1 to 1.  A positive r value means the response variable increases as the explanatory variable increases, while a negative r value means an increase in the explanatory variable leads to a decrease in the response variable.  An r value near 0 means the relationship is relatively weak, while a value near -1 or 1 indicates a strong relationship.  Since both positive and negative numbers become positive when we square them, we have to find r in other ways. A direct method is the cor function. Try cor.test(traffic$CO, traffic$Traffic)
+  CorrectAnswer: cor.test(traffic$CO, traffic$Traffic)
+  AnswerTests: omnitest(correctExpr='cor.test(traffic$CO, traffic$Traffic)')
+  Hint: Try cor.test(traffic$CO, traffic$Traffic)
+  
+- Class: mult_question
+  Output: The output shows a test for the strength of the relationship (same p-value we saw before).  It also shows the r (cor) value.  What does the output suggest the r value is?
+  AnswerChoices: 0.96; 0.52; I'm not sure
+  CorrectAnswer: 0.96
+  AnswerTests: omnitest(correctVal='0.96')
+
+- Class: mult_question
+  Output: Since this is positive, it means an increase in one factor leads to an increase in the other.  Correlation (r) and multiple R2 measures are unitless, which means what we measure the factors in does not matter. However, we can also find model-specific slopes that tell us how an increase in one unit of the explanatory variable impacts the response variable.  Scroll back up and find the summary output (or run summary(co_traffic_relationship) again)).  Look under the Estimate column.  It tells you how an increase in one unit for the factor named in that row (here, traffic intensity) impacts emissions. What is the number?
+  AnswerChoices: .021; .001; 16.68
+  CorrectAnswer: .021
+  AnswerTests: omnitest(correctVal='.021')
+
+- Class: text
+  Output: This response is model-specific (if we changed units it would change!) but is useful for explaining what the model means. Here, each one unit increase in traffic intensity leads to a .02 unit increase in emissions.  
+  
+- Class: text
+  Output: The math (and functions) for correlation and regression work out the same, so you only need to understand the difference. Correlation analysis is considering a relationship among the variables and typically uses randomly data.  Regression is seeking to develop a response equation so you can predict one variable from another. This implies causation, so you typically want to pick a clear response and explanatory variable and vary the explanatory variable in a controlled manner.  For example, instead of simply collecting data from a highway site, we could simulate vehicle emissions in a lab (running car engines in a closed environment) and measure emissions to verify our results.  The major issue here is realizing correlation does not imply causation! Two variables may be correlated because they both respond to other, untested variables.  
+
+- Class: cmd_question
+  Output: Finally, we can relax our normality assumptions if we use rank-based data.  To have R do this, you use the cor.test function, but specify method = "spearman". Try cor.test(traffic$Traffic, traffic$CO, method = "spearman").
+  CorrectAnswer: cor.test(traffic$Traffic, traffic$CO, method = "spearman")
+  AnswerTests: omnitest(correctExpr='cor.test(traffic$Traffic, traffic$CO, method = "spearman")')
+  Hint: Try cor.test(traffic$Traffic, traffic$CO, method = "spearman")
+
+- Class: text
+  Output: This concludes our regression and correlation review. Note we did not cover post-hoc tests (you don't need them for exploring relationships among continuous variables).  We also did not cover bootstrap or permutation approaches to regression and correlation, but these methods do exist.  
